@@ -3,6 +3,8 @@ from typing import Union
 from dotenv import load_dotenv
 import streamlit as st
 import os
+import torch
+
 import glob
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -12,6 +14,8 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores.utils import DistanceStrategy
 from mistralai.client import MistralClient
 from mistralai.models.chat_completion import ChatMessage
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 st.title("Similar Patents")
 
@@ -50,7 +54,7 @@ if __name__ == "__main__":
     embedding_model = HuggingFaceEmbeddings(
         model_name=EMBEDDING_MODEL_NAME,
         multi_process=True,
-        model_kwargs={"device": "cuda"},
+        model_kwargs={"device": device},
         encode_kwargs={"normalize_embeddings": True},  # Set `True` for cosine similarity
     )
 
