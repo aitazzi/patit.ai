@@ -12,13 +12,13 @@ with st.form("patent"):
     )
     questions.append(
         st.text_area(
-            "What the technial problem does this invention deal with? ", height=100
+            "What the technical problem does this invention deal with? ", height=100
         )
     )
     questions.append(
         st.text_area(
-            "If you know some solutions availlable on the market, please give a brief description and their "
-            "inconvenients",
+            "If you know some solutions available on the market, please give a brief description and their "
+            "inconvenient",
             height=100,
         )
     )
