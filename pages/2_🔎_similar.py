@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 import streamlit as st
 import os
 import torch
-
+import re
 import glob
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -93,8 +93,8 @@ if __name__ == "__main__":
             chat_response = client.chat(
                 model=model,
                 messages=[
-                    ChatMessage(role="system", content="""Can you give me all the differences between the user_patent and similar_patent,
-                                can you also give me at the end a score in % on how much the user_patent is close to similar_patent """),
+                    ChatMessage(role="system", content="""Can you give me all the differences between the user_patent 
+                    and similar_patent"""),
                     ChatMessage(role="user", content=f"""
                                 user_patent : {user_query} 
                                 
@@ -104,4 +104,28 @@ if __name__ == "__main__":
                 ]
             )
             st.header("key differences")
-            st.write(chat_response.choices[0].message.content)
+            diff = chat_response.choices[0].message.content
+            st.write(diff)
+
+            chat_response = client.chat(
+                model=model,
+                messages=[
+                    ChatMessage(role="system", content="""Given the key differences between user_patent and 
+                    similar_patent can you give a score in % on how much the user_patent is close to similar_patent,
+                    The answer should be in the format: Estimated difference percentage %.
+                    Do not add any additional sentences"""),
+                    ChatMessage(role="user", content=f"""
+                                key differences: {diff}
+                                """),
+                ]
+            )
+            st.header("Difference Rate")
+            diff_rate = chat_response.choices[0].message.content
+            st.write(diff_rate)
+            percents = re.findall(r'\d+', diff_rate)
+            if percents:
+                percent = percents[0]
+                if int(percent) >= 70:
+                    st.write(f"The score {percent} % is greater than 70 %: **:green[Your Idea is ready to be patented "
+                             f"!]**")
+
